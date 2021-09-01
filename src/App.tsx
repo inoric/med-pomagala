@@ -13,6 +13,8 @@ import {
 import Zaduzenje from './Zaduzenje';
 import Razduzenje from './Razduzenje';
 import Home from './Home';
+import Arhiva from './Arhiva';
+import Inventar from './Inventar';
 
 
 function App() {
@@ -24,6 +26,12 @@ function App() {
           </Route>
           <Route path="/razduzenje">
             <Razduzenje />
+          </Route>
+          <Route path="/arhiva">
+            <Arhiva />
+          </Route>
+          <Route path="/inventar">
+            <Inventar />
           </Route>
           <Route path="/">
             <Home />

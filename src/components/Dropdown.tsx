@@ -37,7 +37,7 @@ export const Dropdown = (props: Props) => {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Listbox.Options className="absolute w-full py-1 z-20 mt-1 overflow-auto text-base bg-white rounded shadow max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+            <Listbox.Options className="absolute w-full py-1 z-20 mt-1 overflow-auto text-base bg-white rounded shadow max-h-52 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
               {people.map((person, personIdx) => (
                 <Listbox.Option
                   key={personIdx}

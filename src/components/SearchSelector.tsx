@@ -84,7 +84,7 @@ export const SearchSelector = ({overlay}: Props) => {
         </div>
         
 
-        <div className="w-full max-h-36 border rounded mt-2 px-3 overflow-auto">
+        <div className="w-full max-h-36 md:max-h-52 border rounded mt-2 px-3 overflow-auto">
         {people.map((person, id) => (
             <div className={(person.name.includes(search))?"":"hidden"}>
             <div onClick={() => setSelected(person.id)} className={(person.id==selected)?"p-3 w-full flex justify-center shadow rounded items-center h-24 my-2 transition-all duration-300 bg-blue-100":"duration-300 transition-all px-3 w-full flex shadow rounded items-center justify-center h-12 my-2"}>

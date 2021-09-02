@@ -1,9 +1,8 @@
-import { ChevronDownIcon, ChevronLeftIcon, ChevronUpIcon, ClipboardCheckIcon, CollectionIcon } from "@heroicons/react/outline";
 import { MinusIcon, PlusIcon } from "@heroicons/react/solid";
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { Dropdown } from "./components/Dropdown";
 import InventoryDropdown from "./components/InventoryDropdown";
+import MainMenu from "./components/MainMenu";
 
 
 const inventory = [
@@ -47,6 +46,7 @@ const inventory = [
 
 export default function Inventar(){
     const [open, setOpen] = useState<boolean>(false);
+    const [todelete, setTodelete] = useState<string>("none");
     function calcAvailable(item: Array<{code: string, available: boolean}>){
         let available = 0;
         item.forEach((item) => {
@@ -55,34 +55,59 @@ export default function Inventar(){
 
         return available;
     }
+    function totalItemsInInventory(){
+        let total = 0;
+        inventory.forEach((item) => {
+            total += item.items.length;
+        });
+
+        return total;
+    }
+    function totalAvailableItemsInInventory(){
+        let total = 0;
+        inventory.forEach((item) => {
+            total += calcAvailable(item.items);
+        });
+
+        return total;
+    }
     return(
-        <div className="flex w-screen min-h-screen">
+        <div className="flex w-full h-screen">
             
-            <div className={"flex-1 transition-all flex flex-col md:p-10 md:pl-20 overflow-hidden p-5 "}>
+            <div className={"flex-1 transition-all flex flex-col md:p-10 md:pl-20 overflow-auto p-5 no-scrollbar "}>
             <div className="flex w-full items-center pb-5">
-                <Link to="/" className="flex items-center">
-                    <ChevronLeftIcon className="h-5 w-5 text-gray-500" />
-                    <p className="text-gray-500">back</p>
-                </Link>
+
                 <div className="flex-1"></div>
-                <CollectionIcon className="h-5 w-5 text-gray-500" />
+                <MainMenu currentPage="inventory" />
             </div>
-                <div className="flex justify-between items-center">
-                    <div className="flex flex-col w-full">
-                        <p className="text-gray-500">Ukupno uređaja u inventaru</p>
+                <div className="flex justify-start items-end">
+                    <div className="flex flex-col">
+                        <p className="text-gray-500 mr-5">Ukupno uređaja u<br></br> inventaru</p>
                         <div className="flex justify-center p-3 w-full">
-                            <p className="text-7xl font-bold py-3">1032</p>
+                            <p className="text-7xl font-bold py-3">{totalItemsInInventory()}</p>
                             <div className="flex-1"></div>
-                            <div className="flex items-center md:hidden">
-                                <div className="p-2 shadow rounded flex items-center justify-center" onClick={() => setOpen(!open)}>
-                                    <PlusIcon className="text-green-500 w-6 h-6" />
-                                </div>
-                            </div>
-                            
                         </div>
-                        
+                    </div>
+                    <div className="flex flex-col">
+                        <p className="text-gray-500 mr-5">Ukupno dostupnih<br></br>uređaja</p>
+                        <div className="flex justify-center p-3 w-full">
+                            <p className="text-5xl text-gray-700 font-semibold py-3">{totalAvailableItemsInInventory()}</p>
+                            <div className="flex-1"></div>
+                        </div>
+                    </div>
+                    <div className="flex flex-col">
+                        <p className="text-gray-500 mr-5">Ukupno zaduženih<br></br>uređaja</p>
+                        <div className="flex justify-center p-3 w-full">
+                            <p className="text-5xl text-gray-700 font-semibold py-3">{totalItemsInInventory() - totalAvailableItemsInInventory()}</p>
+                            <div className="flex-1"></div>
+                        </div>
                     </div>
                     
+                </div>
+                <div className="fixed bottom-0 right-0 p-5 md:hidden z-10">
+                    <div className="p-4 rounded-full bg-green-500 flex items-center justify-center" onClick={() => setOpen(!open)}>                       
+                        {open===false?<PlusIcon className="text-white w-6 h-6" />:<MinusIcon className="text-white w-6 h-6" />}
+                    </div>
                 </div>
                 <div className="w-full mt-10">
                     <div className="flex items-center justify-center">
@@ -95,9 +120,9 @@ export default function Inventar(){
                         <div className="w-6 h-6"></div>
                     </div>
                     {inventory.map((item, index) => (
-                        <InventoryDropdown index={index} item={item} />
+                        <InventoryDropdown index={index} item={item} settodelete={(arg: string) => setTodelete(arg)} />
                     ))}
-
+                    <div className="w-full h-3"></div>
                 </div>
             </div>
 
@@ -113,12 +138,34 @@ export default function Inventar(){
                     <p className=" flex-1 font-semibold">Dodaj u inventar</p>
                     <PlusIcon className="w-5 h-5 text-green-500" />
                 </div>
-                <div className=" flex rounded shadow w-full p-5 my-3 items-center md:hidden" onClick={() => setOpen(!open)}>
-                    <ChevronLeftIcon className="w-5 h-5 text-gray-500 mr-5" />
-                    <p className=" flex-1 font-semibold">Nazad</p>
-                    
-                </div>
             </div>
+
+
+
+            <div className={`
+            bg-white-opacity flex-col absolute w-full h-screen z-20 p-5 transition-opacity duration-200
+            ${todelete!=="none"?"flex opacity-100":"flex opacity-0 -z-10"}`}>
+                <div className="flex-1 transition" onClick={()=>setTodelete("none")}></div>
+                <div className="flex">
+                <div className="md:flex-1" onClick={()=>setTodelete("none")}></div>
+                <div className="p-5 bg-white rounded shadow max-w-xl flex-1 transition mx-auto">
+                    <div className="flex items-center">
+                        <p className="text-lg font-semibold">UPOZORENJE</p>
+                        <div className="flex-1"></div>
+                        
+                    </div>
+                    <p className="text-sm text-gray-500">Da li sigurno želite izbrisat {todelete} iz baze</p>
+                    <div className="shadow rounded p-3 flex items-center mt-3">
+                        <MinusIcon className="h-5 w-5 text-red-500 mr-2" />
+                        <p>Potvrdi</p>
+                    </div>
+                </div>
+                <div className="md:flex-1" onClick={()=>setTodelete("none")}></div>
+                </div>
+                <div className="flex-1 transition" onClick={()=>setTodelete("none")}></div>
+            </div>
+
+
         </div>
     )
 }

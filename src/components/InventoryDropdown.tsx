@@ -11,10 +11,11 @@ interface Props {
             available: boolean;
         }[];
     },
+    settodelete: (index: string) => void;
 }
 
 
-export default function({index, item}: Props){
+export default function({index, item, settodelete}: Props){
     const [open, setOpen] = useState<string>("none");
     function calcAvailable(item: Array<{code: string, available: boolean}>){
         let available = 0;
@@ -44,7 +45,7 @@ export default function({index, item}: Props){
                         <p className="text-gray-500">{items.code}</p>
                     </div>
                     <p className={"px-5 " + (items.available?"text-green-500":"text-red-500")}>{items.available?"dostupno":"zaduženo"}</p>
-                    <MinusIcon className="h-6 w-6 text-red-500" />
+                    <MinusIcon className="h-6 w-6 text-red-500" onClick={() => settodelete(items.code)} />
                 </div>
             ))}
             </div>

@@ -8,7 +8,9 @@ module.exports = {
         
       },
       height: {
-        '-2': '-2rem'
+        '-2': '-2rem',
+        '3': '3rem',
+        'big': '5rem',
       },
       backgroundColor: {
         'white-opacity': 'rgba(255,255,255,0.5)'

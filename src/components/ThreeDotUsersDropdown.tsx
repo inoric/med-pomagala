@@ -1,6 +1,6 @@
 import { Menu, Transition } from '@headlessui/react'
 import { Fragment } from 'react'
-import { CheckIcon, DotsVerticalIcon, InformationCircleIcon } from '@heroicons/react/outline'
+import {  DotsVerticalIcon, PencilIcon, TrashIcon } from '@heroicons/react/outline'
 
 
 interface Props {
@@ -9,7 +9,7 @@ interface Props {
 }
 
 
-export default function ThreeDotDropdown({id, increment}: Props) {
+export default function ThreeDotUsersDropdown({id, increment}: Props) {
 
   return (
     <div className="w-16 text-right">
@@ -33,46 +33,46 @@ export default function ThreeDotDropdown({id, increment}: Props) {
             <Menu.Item>
                 {({ active }) => (
                   <button
-                    onClick={() => increment("razduzi", id)}
+                    onClick={() => increment("uredi", id)}
                     className={`${
                       active ? 'bg-blue-500 text-white' : 'text-gray-900'
                     } group flex rounded-md items-center w-full px-2 py-2 text-sm`}
                   >
                     {active ? (
-                      <CheckIcon
+                      <PencilIcon
                         className="w-5 h-5 mr-2 text-white-500"
                         aria-hidden="true"
                       />
                     ) : (
-                      <CheckIcon
-                        className="w-5 h-5 mr-2 text-green-500"
+                      <PencilIcon
+                        className="w-5 h-5 mr-2 text-blue-500"
                         aria-hidden="true"
                       />
                     )}
-                    Razduži
+                    Uredi
                   </button>
                 )}
               </Menu.Item>
               <Menu.Item>
                 {({ active }) => (
                   <button
-                    onClick={() => increment("detalji", id)}
+                    onClick={() => increment("izbrisi", id)}
                     className={`${
-                      active ? 'bg-blue-500 text-white' : 'text-gray-900'
+                      active ? 'bg-red-500 text-white' : 'text-gray-900'
                     } group flex rounded-md items-center w-full px-2 py-2 text-sm`}
                   >
                     {active ? (
-                      <InformationCircleIcon
+                      <TrashIcon
                         className="w-5 h-5 mr-2 text-white-500"
                         aria-hidden="true"
                       />
                     ) : (
-                      <InformationCircleIcon
-                        className="w-5 h-5 mr-2 text-blue-500"
+                      <TrashIcon
+                        className="w-5 h-5 mr-2 text-red-500"
                         aria-hidden="true"
                       />
                     )}
-                    Detalji
+                    Izbriši
                   </button>
                 )}
               </Menu.Item>

@@ -1,28 +1,24 @@
-import React from 'react';
-import huuuman from './Huuumans.png';
-import { Fragment, useState } from 'react'
-import { Listbox, Transition } from '@headlessui/react'
-import { CheckIcon, SelectorIcon, ChevronLeftIcon, BeakerIcon, CheckCircleIcon, SearchIcon } from '@heroicons/react/outline'
-import { Dropdown } from './components/Dropdown';
 import {
   BrowserRouter as Router,
   Switch,
-  Route,
-  Link
+  Route
 } from "react-router-dom";
 import Zaduzenje from './Zaduzenje';
 import Razduzenje from './Razduzenje';
-import Home from './Home';
 import Arhiva from './Arhiva';
 import Inventar from './Inventar';
+import Users from './Users';
 
 
 function App() {
   return (
     <Router>
         <Switch>
-          <Route path="/zaduzenje">
+        <Route path="/zaduzenje">
             <Zaduzenje />
+          </Route>
+          <Route path="/users">
+            <Users />
           </Route>
           <Route path="/razduzenje">
             <Razduzenje />
@@ -30,11 +26,8 @@ function App() {
           <Route path="/arhiva">
             <Arhiva />
           </Route>
-          <Route path="/inventar">
-            <Inventar />
-          </Route>
           <Route path="/">
-            <Home />
+            <Inventar />
           </Route>
         </Switch>
     </Router>

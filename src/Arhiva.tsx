@@ -1,6 +1,4 @@
-import { ArchiveIcon, ChevronLeftIcon, ClipboardListIcon } from "@heroicons/react/outline";
-import { Link } from "react-router-dom";
-import ThreeDotDropdown from "./components/ThreeDotDropdown";
+import MainMenu from "./components/MainMenu";
 
 
 const data = [
@@ -48,12 +46,8 @@ export default function Arhiva(){
     return(
         <div className="w-full flex p-5 flex-col min-h-screen">
             <div className="flex w-full items-center">
-            <Link to="/" className="flex items-center">
-                <ChevronLeftIcon className="h-5 w-5 text-gray-500" />
-                <p className="text-gray-500">back</p>
-            </Link>
             <div className="flex-1"></div>
-                <ArchiveIcon className="h-5 w-5 text-gray-500" />
+            <MainMenu currentPage="archive" />
             </div>
             <div className="w-full pt-15 p-5 flex flex-col justify-center items-center">
                 <h1 className="text-3xl font-semibold">Arhiva</h1>

@@ -14,7 +14,7 @@ interface Props {
 }
 
 
-export default function({index, item, settodelete}: Props){
+export default function InventoryDropdown({index, item, settodelete}: Props){
     const [open, setOpen] = useState<string>("none");
     function calcAvailable(item: Array<{code: string, available: boolean}>){
         let available = 0;

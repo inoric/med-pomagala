@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import MainMenu from "./components/MainMenu";
+import MainMenu from "../components/MainMenu";
 import { DataGrid, GridColDef, GridToolbarContainer, GridToolbarExport, GridValueGetterParams } from '@material-ui/data-grid';
 
 

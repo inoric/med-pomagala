@@ -1,7 +1,7 @@
 import { PencilIcon, SearchIcon, TrashIcon,  } from "@heroicons/react/outline";
 import React, { useEffect } from "react";
-import MainMenu from "./components/MainMenu";
-import ThreeDotUsersDropdown from "./components/ThreeDotUsersDropdown";
+import MainMenu from "../components/MainMenu";
+import ThreeDotUsersDropdown from "../components/ThreeDotUsersDropdown";
 
 
 interface User {

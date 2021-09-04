@@ -8,7 +8,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const raw = JSON.parse(req.body)
     const inventory = await prisma.inventory.findMany({
         where: {
-            itemId: raw.item
+            itemId: raw.item,
+            deleted: false
         },
         orderBy: {
             code: 'asc'

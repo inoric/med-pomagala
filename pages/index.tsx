@@ -1,6 +1,5 @@
 import { MinusIcon, PlusIcon } from "@heroicons/react/solid";
 import { useEffect, useState } from "react";
-import additem from "./api/additem";
 import { Dropdown } from "../components/Dropdown";
 import InventoryDropdown from "../components/InventoryDropdown";
 import MainMenu from "../components/MainMenu";

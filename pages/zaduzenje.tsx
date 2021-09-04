@@ -120,6 +120,7 @@ function Zaduzenje() {
       let options: {id: number, name: string, available: boolean}[] = []
       for (let i = 0; i < data.length; i++) {
         options.push({id: data[i].id, name: data[i].code, available: data[i].available})
+
       }
       setDropdownCodeOptions(options);
       
@@ -127,7 +128,11 @@ function Zaduzenje() {
   }, [zaduzenje.itemId]);
   useEffect(() => {
     if(dropdownCodeOptions[0] !== undefined)
-    setZaduzenje({ ...zaduzenje, ["inventoryCode"]: dropdownCodeOptions[0].name });
+      for(let i=0;i<dropdownCodeOptions.length;i++)
+        if(dropdownCodeOptions[i].available === true){
+          setZaduzenje({ ...zaduzenje, ["inventoryCode"]: dropdownCodeOptions[i].name });
+          break
+        }
   }, [dropdownCodeOptions]);
   useEffect(() => {
     getUsers().then(data => {

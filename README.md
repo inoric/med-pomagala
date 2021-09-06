@@ -11,7 +11,7 @@ In the project directory, you can run:
 ### `npm run build`
 
 ### `npm start`
-or maybe ### `npm run start`? idk
+or maybe `npm run start`? idk
 
 ## Kako ćeš se snaći? Sigurno se pitaš
 

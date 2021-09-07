@@ -1,12 +1,9 @@
 import { NextApiRequest, NextApiResponse } from "next"
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import prisma from "../../components/client";
 
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
     const data = await prisma.items.findMany();
     res.status(200).json(data)
-    await prisma.$disconnect()
 }
 

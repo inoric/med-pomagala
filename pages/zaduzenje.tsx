@@ -4,6 +4,7 @@ import { Dropdown } from '../components/Dropdown';
 import { SearchSelector } from '../components/SearchSelector';
 import MainMenu from '../components/MainMenu';
 import Image from 'next/image'
+import { useRouter } from 'next/dist/client/router';
 
 interface Order {
   itemId: number, 
@@ -21,19 +22,17 @@ interface User {
   address: string, 
   phone: string
 }
-
+interface Inventory {
+  id: number;
+  name: string;
+  items:
+      {
+          code: string;
+          available: boolean;
+      }[]
+}
 async function getUsers(): Promise<{id: number, name: string, lastname: string, address: string, phone: string}[]> {
   const response = await fetch('/api/getusers', {
-      method: 'GET'
-  });
-  if (!response.ok){
-    throw new Error('Failed to fetch.' + response.statusText);
-  }
-  return await response.json();
-}
-
-async function getItems(): Promise<{id: number, name: string}[]> {
-  const response = await fetch('/api/getitems', {
       method: 'GET'
   });
   if (!response.ok){
@@ -60,17 +59,16 @@ async function submit(item: Order) {
   return await response.json();
 }
 
-
-async function getInventoryCodes(item: number): Promise<{id: number, itemId: string, code: string, available: boolean}[]> {
-  const response = await fetch('/api/getinventorycodes', {
+async function getInventory(): Promise<{fullInventory: Inventory[]}> {
+  const response = await fetch('/api/getinventory', {
       method: 'POST',
-      body: JSON.stringify({item})
   });
   if (!response.ok){
     throw new Error('Failed to fetch.' + response.statusText);
   }
   return await response.json();
 }
+
 async function addUser(item: User) {
   const response = await fetch('/api/adduser', {
       method: 'POST',
@@ -90,9 +88,13 @@ async function addUser(item: User) {
 
 
 function Zaduzenje() {
+  const router = useRouter();
   const [overlay, setOverlay] = useState("none");
   let date = new Date(Date.now()).toLocaleString().split(',')[0]
 
+
+  const [error, setError] = useState("");
+  const [updateUsers, setUpdateUsers] = useState(false);
 
   const [osoba, setOsoba] = useState<User>({name: "", lastname: "", address: "", phone: ""});
   const [dropdownUserOptions, setDropdownUserOptions] = useState<{id: number, name: string, lastname: string, address: string, phone: string}[]>([]);
@@ -100,31 +102,34 @@ function Zaduzenje() {
 
   const [dropdownOptions, setDropdownOptions] = useState<{id: number, name: string, available: boolean}[]>([]);
   const [dropdownCodeOptions, setDropdownCodeOptions] = useState<{id: number, name: string, available: boolean}[]>([]);
-  const [zaduzenje, setZaduzenje] = useState<Order>({itemId: 0, itemName: "", inventoryCode: "", userId: 0, takenById: 0, givenById: -1, takenAt: date});
-  
+  const [zaduzenje, setZaduzenje] = useState<Order>({itemId: -1, itemName: "", inventoryCode: "", userId: -1, takenById: -1, givenById: 1, takenAt: date});
+  const [inventory, setInventory] = useState<Inventory[]>([]);
   useEffect(() => {
-      getItems().then(data => {
-          let options: {id: number, name: string, available: boolean}[] = []
-          for (let i = 0; i < data.length; i++) {
-            options.push({id: data[i].id, name: data[i].name, available: true})
-          }
-          setDropdownOptions(options);
-          if(zaduzenje.itemName === ""){
-          setZaduzenje({ ...zaduzenje, ["itemId"]: data[0].id, ["itemName"]: data[0].name });
-          }
+      getInventory().then(data => {
+        setInventory(data.fullInventory);
+        const raw = data.fullInventory
+        let options: {id: number, name: string, available: boolean}[] = []
+        for (let i = 0; i < raw.length; i++) {
+          options.push({id: raw[i].id, name: raw[i].name, available: true})
+        }
+        setDropdownOptions(options);
+        console.log(options);
+        if(zaduzenje.itemName === ""){
+          setZaduzenje({ ...zaduzenje, ["itemId"]: raw[0].id, ["itemName"]: raw[0].name });
+        }
       });
       
   }, []);
   useEffect(() => {
-    getInventoryCodes(zaduzenje.itemId).then(data => {
-      let options: {id: number, name: string, available: boolean}[] = []
-      for (let i = 0; i < data.length; i++) {
-        options.push({id: data[i].id, name: data[i].code, available: data[i].available})
-
+    for(let i = 0; i < inventory.length; i++){
+      if(inventory[i].id === zaduzenje.itemId){
+        let options: {id: number, name: string, available: boolean}[] = []
+        for (let j = 0; j < inventory[i].items.length; j++) {
+          options.push({id: -1, name: inventory[i].items[j].code, available: inventory[i].items[j].available})
+        }
+        setDropdownCodeOptions(options);
       }
-      setDropdownCodeOptions(options);
-      
-    });
+    }
   }, [zaduzenje.itemId]);
   useEffect(() => {
     if(dropdownCodeOptions[0] !== undefined)
@@ -138,10 +143,19 @@ function Zaduzenje() {
     getUsers().then(data => {
       setDropdownUserOptions(data);
     });
-  }, []);
-
+  }, [updateUsers]);
+  console.log(zaduzenje);
   return (
   <div className="w-full flex  min-h-screen justify-center">
+
+    <div className={"fixed bottom-0 right-0 w-full p-5 md:w-110 transition-all z-50" + (error === "" ? " -mb-20":"") } onClick={() => setError("")}>
+        <div className="bg-red-500 text-white p-3 rounded shadow-xl">
+            <p className="text-xl font-semibold">Error</p>
+            <p className="">{error}</p>
+        </div>
+    </div>
+
+
     <div className="flex flex-col p-5 flex-1">
     <div className="flex w-full items-center">
       <div className="flex-1"></div>
@@ -212,7 +226,14 @@ function Zaduzenje() {
     
     </div>
     <button className="rounded max-w-xl z-0 mx-auto mt-3 shadow w-full p-3 text-white bg-blue-900 font-semibold text-lg active:bg-blue-900 active:text-white"
-            onClick={() => submit(zaduzenje)}>
+            onClick={() => {
+              if(zaduzenje.userId === -1 || zaduzenje.takenById === -1 || zaduzenje.itemId === -1 || zaduzenje.inventoryCode === "")
+              setError("Unesi sva polja prvo!")
+              else{
+                submit(zaduzenje)
+                router.push("/razduzenje")
+              }
+            }}>
     unesi</button>
     </div>
 
@@ -253,7 +274,13 @@ function Zaduzenje() {
                             className="p-2 pl-3 min-w-0 border rounded focus:outline-none"/>
                   </div>
                 </div>
-                <div className="shadow rounded p-3 flex items-center mt-3" onClick={() => {addUser(osoba); setOverlay("razduzi")}}>
+                <div 
+                  className="shadow rounded p-3 flex items-center mt-3" 
+                  onClick={() => {
+                    addUser(osoba); 
+                    setOverlay("razduzi");
+                    setUpdateUsers(!updateUsers);
+                  }}>
                       <PlusIcon className="h-5 w-5 text-green-500 mr-2" />
                       <p>Dodaj</p>
                   </div>

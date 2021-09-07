@@ -1,77 +1,59 @@
 import { NextApiRequest, NextApiResponse } from "next"
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import prisma from "../../components/client"
 
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
     let fullInventory: 
-    {name: string;
+    {
+        id: number,
+        name: string;
         items: 
         {  
             available: boolean;
             code: string;
         }[]
     }[] = []
-    let available = false
-    let maderfaker = []
-    let shortInventory: {available: boolean; code: string}[] = []
-    const items = await prisma.items.findMany();
-
-    for (let i = 0; i < items.length; i++) {
-        shortInventory = []
-        let item = items[i];
-        let inventory = await prisma.inventory.findMany({
-            where: {
-                itemId: item.id,
-                deleted: false
-            },
-            orderBy: {
-                code: "asc"
-            }
-        })
-
-        for (let j = 0; j < inventory.length; j++) {
-            let inv = inventory[j]
-            let order = await prisma.orders.findFirst({
-                where: {
-                    inventoryId: inv.code
+    
+    const TheBigCall = await prisma.items.findMany({
+        include: {
+            Inventory: {
+                include: {
+                    Orders: {
+                        include: {
+                            Returns: true
+                        },
+                        orderBy: {
+                            id: "desc"
+                        }
+                    }
                 },
                 orderBy: {
-                    id: "desc"
+                    code: "asc"
+                },
+                where: {
+                    deleted: false
                 }
-            })
-            available = false
-            if(order !== null) {
-                let returns = await prisma.returns.count({
-                    where: {
-                        orderId: order.id
-                    }
-                })
-                
-                if(returns > 0) {
-                    available = true
-                }
-            }else{
-                available = true 
             }
-            shortInventory.push({
-                available: available,
-                code: inv.code
-            })
-            
-
         }
-        maderfaker.push(shortInventory)
-        fullInventory.push({
-            name: item.name,
-            items: shortInventory
-        })
-
-    }
+    })
     
+    TheBigCall.forEach(item => {
+        let itemInventory: {available: boolean, code: string}[] = []
+        item.Inventory.forEach(inventory => {
+            if (inventory.Orders.length === 0) {
+                itemInventory.push({available: true, code: inventory.code})
+            } else {
+                if (inventory.Orders[0].Returns === null) {
+                    itemInventory.push({available: false, code: inventory.code})
+                }else{
+                    itemInventory.push({available: true, code: inventory.code})
+                }
+                
+            }
+        })
+        fullInventory.push({id: item.id, name: item.name, items: itemInventory})
+    })
 
     res.status(200).json({fullInventory})
-    await prisma.$disconnect()
 }
 

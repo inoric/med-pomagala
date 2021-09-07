@@ -1,0 +1,2 @@
+-- AddForeignKey
+ALTER TABLE "Inventory" ADD FOREIGN KEY ("itemId") REFERENCES "Items"("id") ON DELETE CASCADE ON UPDATE CASCADE;

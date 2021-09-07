@@ -8,39 +8,52 @@ datasource db {
 }
 
 model Users {
-  id       Int    @id @default(autoincrement())
-  name     String
-  lastname String
-  phone    String
-  address  String
+  id        Int     @id @default(autoincrement())
+  name      String
+  lastname  String
+  phone     String
+  address   String
   superuser Boolean @default(false)
-  deleted  Boolean @default(false)
+  deleted   Boolean @default(false)
+  givenBy   Orders[]  @relation("user")
+  user   Orders[]  @relation("givenBy")
+  takenBy   Orders[]  @relation("takenBy")
+
 }
 
 model Items {
-  id Int @id @default(autoincrement())
+  id   Int    @id @default(autoincrement())
   name String @unique
+  Inventory Inventory[]
 }
 
 model Inventory {
-  id Int @id @default(autoincrement())
-  itemId Int
-  code String @unique
+  id      Int     @id @default(autoincrement())
+  item    Items     @relation(fields: [itemId], references: [id])
+  itemId  Int     
+  code    String  @unique
   deleted Boolean @default(false)
+  Orders  Orders[]
 }
 
 model Orders {
-  id Int @id @default(autoincrement())
-  userId Int
+  id          Int         @id @default(autoincrement())
+  user        Users       @relation(fields: [userId], references: [id], name: "user")
+  userId      Int
+  inventory   Inventory   @relation(fields: [inventoryId], references: [code])
   inventoryId String
-  takenById Int
-  givenById Int
-  takenAt String
+  takenBy     Users       @relation(fields: [takenById], references: [id], name: "takenBy")
+  takenById   Int
+  givenBy     Users       @relation(fields: [givenById], references: [id], name: "givenBy")
+  givenById   Int
+  takenAt     String
+  Returns     Returns?
 }
 
 model Returns {
-  id Int @id @default(autoincrement())
-  orderId Int
-  TakenById Int
+  id         Int    @id @default(autoincrement())
+  order      Orders @relation(fields: [orderId], references: [id])
+  orderId    Int
+  TakenById  Int
   returnedAt String
 }

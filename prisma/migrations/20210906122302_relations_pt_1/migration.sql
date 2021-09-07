@@ -1,0 +1,2 @@
+-- AddForeignKey
+ALTER TABLE "Returns" ADD FOREIGN KEY ("orderId") REFERENCES "Orders"("id") ON DELETE CASCADE ON UPDATE CASCADE;

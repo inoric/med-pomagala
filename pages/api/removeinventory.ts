@@ -1,7 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next"
-import { PrismaClient } from '@prisma/client'
+import prisma from "../../components/client";
 
-const prisma = new PrismaClient()
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const data = JSON.parse(req.body)
@@ -14,6 +13,5 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
        }
   })
   res.status(200).json(user)
-  await prisma.$disconnect()
 }
 

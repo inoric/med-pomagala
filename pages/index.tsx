@@ -6,6 +6,7 @@ import MainMenu from "../components/MainMenu";
 
 
 interface Inventory {
+    id: number;
     name: string;
     items:
         {
@@ -24,23 +25,13 @@ async function getInventory(): Promise<{fullInventory : Inventory[]}> {
     return await response.json();
 }
 
-async function getItems(): Promise<{id: number, name: string}[]> {
-    const response = await fetch('/api/getitems', {
-        method: 'GET'
-    });
-    if (!response.ok){
-      throw new Error('Failed to fetch.' + response.statusText);
-    }
-    return await response.json();
-}
-
-async function submit(item: {itemId: number, itemName: string, inventoryCode: string}) {
+async function submit(item: {itemId: number, itemName: string, inventoryCode: string}): Promise<{id:number,itemId:number,code:string,deleted: boolean} | null>  {
     const response = await fetch('/api/additem', {
         method: 'POST',
         body: JSON.stringify(item),
     });
     if (!response.ok){
-      return new Error('Failed to fetch.' + response.statusText);
+      return null;
     }
     return await response.json();
 }
@@ -59,27 +50,30 @@ export default function Inventar(){
     const [todelete, setTodelete] = useState<string>("none");
     const [newitem, setNewitem] = useState<boolean>(false);
 
+    const [error, setError] = useState<string>("");
+    const [updateInventory, setUpdateInventory] = useState<boolean>(false);
+
     const [inventoryItems, setInventoryItems] = useState<Inventory[]>([]);
     const [dropdownOptions, setDropdownOptions] = useState<{id: number, name: string, available: boolean}[]>([]);
     const [uredaj, setUredaj] = useState<{itemId: number, itemName: string, inventoryCode: string}>({itemId: 0, itemName: "", inventoryCode: ""})
 
     useEffect(() => {
-        getItems().then(data => {
-            for (let i = 0; i < data.length; i++) {
-                setDropdownOptions(prev => [...prev, {id: data[i].id, name: data[i].name, available: true}])
-            }
-            if(uredaj.itemName === ""){
-            setUredaj({ ...uredaj, ["itemId"]: data[0].id, ["itemName"]: data[0].name });
-            }
-        });
-    }, []);
-
-    useEffect(() => {
         getInventory().then(data => {
-            console.log(data)
+            
             setInventoryItems(data.fullInventory);
+            if(dropdownOptions.length === 0){
+                for (let i = 0; i < data.fullInventory.length; i++) {
+                    setDropdownOptions(prev => [...prev, {id: data.fullInventory[i].id, name: data.fullInventory[i].name, available: true}])
+                }
+            }
+            try{
+                setUredaj({ ...uredaj, ["itemId"]: data.fullInventory[0].id, ["itemName"]: data.fullInventory[0].name });
+            }   
+            catch{
+                console.log("error");
+            }
         });
-    }, []);
+    }, [updateInventory]);
 
     function calcAvailable(item: Array<{code: string, available: boolean}>){
         let available = 0;
@@ -108,6 +102,18 @@ export default function Inventar(){
     return(
         <div className="flex w-full h-screen">
             
+
+            <div className={"fixed bottom-0 right-0 w-full p-5 md:w-110 transition-all z-50" + (error === "" ? " -mb-20":"") } onClick={() => setError("")}>
+                <div className="bg-red-500 text-white p-3 rounded shadow-xl">
+                    <p className="text-xl font-semibold">Error</p>
+                    <p className="">{error}</p>
+                </div>
+            </div>
+
+
+
+
+
             <div className={"flex-1 transition-all flex flex-col md:p-10 md:pl-20 overflow-auto p-5 no-scrollbar "}>
             <div className="flex w-full items-center pb-5 ">
 
@@ -186,7 +192,20 @@ export default function Inventar(){
                 <input  type="text" 
                         className="p-2 pl-3 w-full border rounded focus:outline-none"
                         onChange={(e) => setUredaj({ ...uredaj, ["inventoryCode"]: e.target.value })} />
-                <div className=" flex rounded shadow w-full p-5 my-3 items-center" onClick={() => submit(uredaj)}>
+                <div 
+                    className=" flex rounded shadow w-full p-5 my-3 items-center" 
+                    onClick={() => {
+                        if(uredaj.inventoryCode === "")setError("Kod artikla je obavezan!");
+                        else if(uredaj.itemName === "")setError("Naziv artikla je obavezan!");
+                        else{
+                            submit(uredaj).then(data => {
+                                if(data === null) {
+                                    setError("Već postoji artikl s tim kodom!");
+                                }
+                            })
+                            setUpdateInventory(!updateInventory)
+                        }
+                    }}>
                     <p className=" flex-1 font-semibold">Dodaj u inventar</p>
                     <PlusIcon className="w-5 h-5 text-green-500" />
                 </div>
@@ -207,7 +226,13 @@ export default function Inventar(){
                         
                     </div>
                     <p className="text-sm text-gray-500">Da li sigurno želite izbrisat {todelete} iz baze</p>
-                    <div className="shadow rounded p-3 flex items-center mt-3" onClick={() => remove(todelete)}>
+                    <div 
+                        className="shadow rounded p-3 flex items-center mt-3" 
+                        onClick={() => {
+                            remove(todelete)
+                            setTodelete("none")
+                            setUpdateInventory(!updateInventory)
+                        }}>
                         <MinusIcon className="h-5 w-5 text-red-500 mr-2" />
                         <p>Potvrdi</p>
                     </div>
@@ -221,3 +246,4 @@ export default function Inventar(){
         </div>
     )
 }
+

@@ -5,30 +5,35 @@ import prisma from "../../components/client"
 export default async (req: NextApiRequest, res: NextApiResponse) => {
     const data = JSON.parse(req.body)
     //count rows where name = data.name
-    const count = await prisma.items.count({
-        where: {
-            name: data.itemName
-        }
-    })
-    if(count === 0){
+    const itemid = await prisma.items.findFirst({
+      where: {
+        name: data.itemName,
+      },
+  })
+    if(itemid === null){
       const updatedData = await prisma.items.create({
           data: {
             name: data.itemName,
           },
       })
-    }
-    const itemid = await prisma.items.findFirst({
-        where: {
-          name: data.itemName,
+      const updated2Data = await prisma.inventory.create({
+        data: {
+          itemId: updatedData.id,
+          code: data.inventoryCode,
         },
-    }) || {id: 1}
-    const updated2Data = await prisma.inventory.create({
-      data: {
-        itemId: itemid.id,
-        code: data.inventoryCode,
-      },
-    })
+      })
+    }else{
+      const updated2Data = await prisma.inventory.create({
+        data: {
+          itemId: itemid.id,
+          code: data.inventoryCode,
+        },
+      })
+    }
 
-    res.status(200).json(updated2Data)
+    
+    
+
+    res.status(200).json({})
 }
 

@@ -61,16 +61,19 @@ export default function Inventar(){
         getInventory().then(data => {
             
             setInventoryItems(data.fullInventory);
-            if(dropdownOptions.length === 0){
-                for (let i = 0; i < data.fullInventory.length; i++) {
-                    setDropdownOptions(prev => [...prev, {id: data.fullInventory[i].id, name: data.fullInventory[i].name, available: true}])
-                }
+            if(dropdownOptions.length > 0){
+                setDropdownOptions([]);
             }
-            try{
-                setUredaj({ ...uredaj, ["itemId"]: data.fullInventory[0].id, ["itemName"]: data.fullInventory[0].name });
-            }   
-            catch{
-                console.log("error");
+            for (let i = 0; i < data.fullInventory.length; i++) {
+                setDropdownOptions(prev => [...prev, {id: data.fullInventory[i].id, name: data.fullInventory[i].name, available: true}])
+            }
+            if(dropdownOptions.length === 0){
+                try{
+                    setUredaj({ ...uredaj, ["itemId"]: data.fullInventory[0].id, ["itemName"]: data.fullInventory[0].name });
+                }   
+                catch{
+                    console.log("error");
+                }
             }
         });
     }, [updateInventory]);
@@ -202,8 +205,9 @@ export default function Inventar(){
                                 if(data === null) {
                                     setError("Već postoji artikl s tim kodom!");
                                 }
+                                setUpdateInventory(!updateInventory)
                             })
-                            setUpdateInventory(!updateInventory)
+                            
                         }
                     }}>
                     <p className=" flex-1 font-semibold">Dodaj u inventar</p>

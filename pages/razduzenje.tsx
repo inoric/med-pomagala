@@ -203,7 +203,7 @@ function Razduzenje(){
                 placeholder="dd/mm/yyyy"
                 onChange={(e) => setDate(e.target.value)}></input>
                 </div>
-                <div className="shadow rounded p-3 flex items-center mt-3" onClick={() => {submit( { orderId: activeOrder.id, takenByid: -1, returnedAt: date } );setOverlay("none");window.location.reload()}}>
+                <div className="shadow rounded p-3 flex items-center mt-3" onClick={() => {submit( { orderId: activeOrder.id, takenByid: 1, returnedAt: date } );setOverlay("none");window.location.reload()}}>
                     <CheckIcon className="h-5 w-5 text-green-500 mr-2" />
                     <p>Potvrdi</p>
                 </div>

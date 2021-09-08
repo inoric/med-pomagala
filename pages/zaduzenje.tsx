@@ -161,9 +161,6 @@ function Zaduzenje() {
       <div className="flex-1"></div>
       <MainMenu currentPage="zaduzenje" />
     </div>
-    <div className="w-full flex justify-center">
-    <Image height={200} width={200} src="/humaaans.png" ></Image>
-    </div>
     
     <div className="w-full pt-15 p-5 flex flex-col justify-center items-center">
       <h1 className="text-3xl font-semibold">Zaduzenje</h1>

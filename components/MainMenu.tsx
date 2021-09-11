@@ -1,6 +1,6 @@
 import { Menu, Transition } from '@headlessui/react'
 import { Fragment } from 'react'
-import { ArchiveIcon, ClipboardCheckIcon, ClipboardListIcon, CollectionIcon,  MenuIcon, UsersIcon } from '@heroicons/react/outline'
+import { ArchiveIcon, ClipboardCheckIcon, ClipboardListIcon, CollectionIcon,  LogoutIcon,  MenuIcon, UsersIcon } from '@heroicons/react/outline'
 import Link from 'next/link'
 
 
@@ -146,6 +146,21 @@ export default function MainMenu({currentPage}: Props) {
                       />
                     )}
                     Arhiva
+                    </div>
+                  </Link>
+                )}
+              </Menu.Item>
+              <Menu.Item>
+                {({ active }) => (
+                  <Link href="/login"><div
+                    
+                    className='bg-white text-red-500 group flex rounded-md items-center w-full px-2 py-2 md:text-sm'
+                  >
+                      <LogoutIcon
+                        className="w-5 h-5 mr-2 text-red-500"
+                        aria-hidden="true"
+                      />
+                    Logout
                     </div>
                   </Link>
                 )}

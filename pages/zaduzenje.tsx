@@ -120,6 +120,12 @@ function Zaduzenje() {
       });
       
   }, []);
+  useEffect(() =>{
+    if(window.sessionStorage.getItem("id")===null){
+        window.location.href = '/login';
+    }
+    setZaduzenje({ ...zaduzenje, ["givenById"]: parseInt(window.sessionStorage.getItem("id") || "1") });
+  }, [])
   useEffect(() => {
     for(let i = 0; i < inventory.length; i++){
       if(inventory[i].id === zaduzenje.itemId){

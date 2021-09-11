@@ -45,6 +45,9 @@ async function remove(id: string) {
     }
     return await response.json();
 }
+
+
+
 export default function Inventar(){
     const [open, setOpen] = useState<boolean>(false);
     const [todelete, setTodelete] = useState<string>("none");
@@ -56,6 +59,12 @@ export default function Inventar(){
     const [inventoryItems, setInventoryItems] = useState<Inventory[]>([]);
     const [dropdownOptions, setDropdownOptions] = useState<{id: number, name: string, available: boolean}[]>([]);
     const [uredaj, setUredaj] = useState<{itemId: number, itemName: string, inventoryCode: string}>({itemId: 0, itemName: "", inventoryCode: ""})
+
+    useEffect(() =>{
+        if(window.sessionStorage.getItem("id")===null){
+            window.location.href = '/login';
+        }
+    }, [])
 
     useEffect(() => {
         getInventory().then(data => {

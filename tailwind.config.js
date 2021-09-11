@@ -14,7 +14,11 @@ module.exports = {
         'big': '5rem',
       },
       backgroundColor: {
-        'white-opacity': 'rgba(255,255,255,0.5)'
+        'white-opacity': 'rgba(255,255,255,0.5)',
+        'sexy': '#66f'
+      },
+      borderColor: {
+        'sexy': '#66f'
       },
       zIndex: {
         '-10': '-10',
@@ -32,6 +36,9 @@ module.exports = {
         '160': '40rem',
         '200': '50rem',
         '240': '60rem',
+      },
+      textColor: {
+        'sexy': '#66f'
       }
     },
   },

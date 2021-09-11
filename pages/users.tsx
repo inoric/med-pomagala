@@ -15,7 +15,10 @@ interface AddUser {
     name: string, 
     lastname: string, 
     address: string, 
-    phone: string
+    phone: string,
+    superuser: boolean,
+    password: string | null,
+    username: string | null
 }
 
 async function getUsers(): Promise<User[]> {
@@ -74,7 +77,7 @@ export default function Users(){
     const [search, setSearch] = useState<string>('')
     const [overlay, setOverlay] = useState<string>("none")
     const [id, setId] = useState<number>(0)
-    const [osoba, setOsoba] = useState<AddUser>({name: "", lastname: "", address: "", phone: ""});
+    const [osoba, setOsoba] = useState<AddUser>({name: "", lastname: "", address: "", phone: "", superuser: false, password: null, username: null});
     const [updateUsers, setUpdateUsers] = useState<boolean>(false);
     
     function setOverlayData(overlayData: string, id: number){
@@ -272,6 +275,25 @@ export default function Users(){
                             onChange={(e) => setOsoba({ ...osoba, ["phone"]: e.target.value })}
                             className="p-2 pl-3 min-w-0 border rounded focus:outline-none"/>
                   </div>
+                  <div className="flex items-center">
+                    <input type="checkbox" className="m-2" onChange={() => setOsoba({...osoba, ["superuser"]: !osoba.superuser})} />
+                    <label className="text-sm text-gray-500 -mt-1">superuser</label>
+                  </div>
+                  <div className={"transition-all overflow-hidden "+(osoba.superuser?"h-32":"h-0")}>
+                    <div className="flex-1 flex flex-col">
+                        <p className="relative bg-white mt-2 text-xs ml-5 -mb-2 text-gray-500 z-10 max-w-min whitespace-nowrap px-2">username</p>
+                        <input  type="text" 
+                                onChange={(e) => setOsoba({ ...osoba, ["username"]: e.target.value })}
+                                className="p-2 pl-3 min-w-0 border rounded focus:outline-none"/>
+                    </div>
+                    <div className="flex-1 flex flex-col">
+                        <p className="relative bg-white mt-2 text-xs ml-5 -mb-2 text-gray-500 z-10 max-w-min whitespace-nowrap px-2">password</p>
+                        <input  type="text" 
+                                onChange={(e) => setOsoba({ ...osoba, ["password"]: e.target.value })}
+                                className="p-2 pl-3 min-w-0 border rounded focus:outline-none"/>
+                    </div>
+                  </div>
+                  
                 </div>
                 <div 
                   className="shadow rounded p-3 flex items-center mt-3" 

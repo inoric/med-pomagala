@@ -11,7 +11,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         lastname: data.lastname,
         address: data.address,
         phone: data.phone,
-        superuser: false
+        superuser: data.superuser,
+        password: data.password,
+        username: data.username,
       },
     })
 

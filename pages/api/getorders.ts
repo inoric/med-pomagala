@@ -33,7 +33,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         if (item.Returns === null) {
             finalData.push({
                 id: item.id, 
-                name: item.user.name,
+                name: item.user.name + " " + item.user.lastname,
                 phone: item.user.phone,
                 address: item.user.address,
                 itemName: item.inventory.item.name,

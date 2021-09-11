@@ -38,6 +38,9 @@ async function addUser(item: AddUser) {
           lastname: item.lastname,
           phone: item.phone,
           address: item.address,
+          superuser: item.superuser,
+          password: item.password,
+          username: item.username
         })
     });
     if (!response.ok){

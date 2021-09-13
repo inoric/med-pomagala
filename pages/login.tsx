@@ -72,6 +72,7 @@ export default function Login() {
                 </div>
                 <div className={"absolute w-full md:w-80 p-2 right-0 top-0 md:mr-40 mt-14 md:mt-12 transition-all " +(open?"opacity-100":"opacity-0 pointer-events-none md:w-72")}>
                     <div className="bg-white shadow-xl rounded-md p-2 px-4">
+                        <form onSubmit={() => plsLogin(loginData)}>
                         <input 
                             className="w-full p-2 rounded shadow my-2" 
                             type="text" 
@@ -85,6 +86,7 @@ export default function Login() {
                         <button 
                         className="w-full p-2 rounded shadow my-2 bg-sexy text-white"
                         onClick={() => plsLogin(loginData)}>Login</button>
+                        </form>
                     </div>
                 </div>
             </div>

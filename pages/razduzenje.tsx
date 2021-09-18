@@ -2,7 +2,8 @@ import { CheckIcon,  SearchIcon } from "@heroicons/react/outline";
 import React, { useEffect } from "react";
 import ThreeDotDropdown from "../components/ThreeDotDropdown";
 import MainMenu from "../components/MainMenu";
-
+import { GetServerSideProps } from "next";
+import jwt from 'jsonwebtoken'
 
 
 interface OrderDetails {
@@ -21,6 +22,10 @@ interface OrderDetails {
 async function submit(item: {orderId: number, takenByid: number, returnedAt: string}) {
     const response = await fetch('/api/returnorder', {
         method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer '+sessionStorage.getItem("token")
+        },
         body: JSON.stringify({
             orderId: item.orderId,
             takenByid: item.takenByid,
@@ -35,7 +40,11 @@ async function submit(item: {orderId: number, takenByid: number, returnedAt: str
 
 async function getOrders(): Promise<OrderDetails[]> {
     const response = await fetch('/api/getorders', {
-        method: 'GET'
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer '+sessionStorage.getItem("token")
+        },
     });
     if (!response.ok){
       throw new Error('Failed to fetch.' + response.statusText);
@@ -64,11 +73,26 @@ function Razduzenje(){
         takenByAddress: "", 
         takenByPhone: "" 
     })
+    const [token, setToken] = React.useState(0);
+
+    
+    useEffect(() => {
+        auth(sessionStorage.getItem("token") || "").then(props => {
+            console.log(props);
+            if(props.error || props.data === null){
+                window.location.href = "/login";
+            }else{
+                setToken(props.data.userId);
+            }
+        }
+        )
+    }, []);
     useEffect(() => {
         getOrders().then(data => {
             setOrders(data)
         })
     }, [])
+
 
     useEffect(() => {
         setActiveOrder(orders.find(obj => {
@@ -95,13 +119,13 @@ function Razduzenje(){
 
     
 
-
+    if(token === 0) return <div></div>;
     return (
     <div className="w-full flex flex-col min-h-screen">
         <div className="flex w-full items-center p-5">
 
             <div className="flex-1"></div>
-            <MainMenu currentPage="razduzenje" />
+            <MainMenu currentPage="razduzenje"   />
         </div>
         <div className="w-full pt-15 p-5 flex flex-col justify-center items-center">
             <h1 className="text-3xl font-semibold">Razduženje</h1>
@@ -203,7 +227,7 @@ function Razduzenje(){
                 placeholder="dd/mm/yyyy"
                 onChange={(e) => setDate(e.target.value)}></input>
                 </div>
-                <div className="shadow rounded p-3 flex items-center mt-3" onClick={() => {submit( { orderId: activeOrder.id, takenByid: 1, returnedAt: date } );setOverlay("none");window.location.reload()}}>
+                <div className="shadow rounded p-3 flex items-center mt-3" onClick={() => {submit( { orderId: activeOrder.id, takenByid: token, returnedAt: date } );setOverlay("none");window.location.reload()}}>
                     <CheckIcon className="h-5 w-5 text-green-500 mr-2" />
                     <p>Potvrdi</p>
                 </div>
@@ -218,5 +242,21 @@ function Razduzenje(){
     </div>
     );
 }
+
+
+async function auth(token: string): Promise<any> {
+    const response = await fetch('/api/verify', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer '+sessionStorage.getItem("token")
+        },
+        body: JSON.stringify({
+            token
+        })
+    });
+    return await response.json();
+}
+
 
 export default Razduzenje;

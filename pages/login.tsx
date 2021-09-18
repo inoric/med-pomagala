@@ -8,23 +8,26 @@ import Image from 'next/image'
 import { ClipboardListIcon, CollectionIcon, InformationCircleIcon, SaveIcon } from '@heroicons/react/outline';
 import { useEffect, useState } from 'react';
 
-
-async function login(item: { username: string, password: string }): Promise<{id: number, error: boolean}> {
+async function login(item: { username: string, password: string }): Promise<{token: string, error: boolean}> {
     const response = await fetch('/api/login', {
         method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer '+sessionStorage.getItem("token")
+        },
         body: JSON.stringify({
           username: item.username,
           password: item.password
         })
     });
     if(!response.ok) {
-        return {id: -1, error: true};
+        return {token: "FU", error: true};
     }
     return await response.json();
   }
 
 
-export default function Login() {
+export default function Login(props: {user: number}) {
     const [logoColor, setLogoColor] = useState('#66F');
     const [bgColor, setBgColor] = useState('#FFF');
     const [open, setOpen] = useState(false);
@@ -44,16 +47,14 @@ export default function Login() {
             }
         });
         
-        
     }, []);
     
     function plsLogin(data: {username: string, password: string}){
         login(data).then(res => {
-            console.log(res);
-            if(res.id === -1){
+            if(res.error){
                 alert('Wrong username or password');
             }else{
-                window.sessionStorage.setItem("id", res.id.toString());
+                sessionStorage.setItem("token", res.token);
                 window.location.href = '/';
             }
         });
@@ -72,7 +73,7 @@ export default function Login() {
                 </div>
                 <div className={"absolute w-full md:w-80 p-2 right-0 top-0 md:mr-40 mt-14 md:mt-12 transition-all " +(open?"opacity-100":"opacity-0 pointer-events-none md:w-72")}>
                     <div className="bg-white shadow-xl rounded-md p-2 px-4">
-                        <form onSubmit={() => plsLogin(loginData)}>
+                        <form onSubmit={(e) => {e.preventDefault(); plsLogin(loginData)}}>
                         <input 
                             className="w-full p-2 rounded shadow my-2" 
                             type="text" 
@@ -85,7 +86,7 @@ export default function Login() {
                             placeholder="Password" />
                         <button 
                         className="w-full p-2 rounded shadow my-2 bg-sexy text-white"
-                        onClick={() => plsLogin(loginData)}>Login</button>
+                        type="submit">Login</button>
                         </form>
                     </div>
                 </div>
@@ -154,3 +155,4 @@ export default function Login() {
         </div>
     )
 }
+

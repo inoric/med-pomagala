@@ -1,8 +1,9 @@
 import { PencilIcon, PlusIcon, SearchIcon, TrashIcon,  } from "@heroicons/react/outline";
+import { GetServerSideProps } from "next";
 import React, { useEffect, useState } from "react";
 import MainMenu from "../components/MainMenu";
 import ThreeDotUsersDropdown from "../components/ThreeDotUsersDropdown";
-
+import jwt from 'jsonwebtoken'
 
 interface User {
     id: number, 
@@ -23,7 +24,11 @@ interface AddUser {
 
 async function getUsers(): Promise<User[]> {
     const response = await fetch('/api/getusers', {
-        method: 'GET'
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer '+sessionStorage.getItem("token")
+        },
     });
     if (!response.ok){
       throw new Error('Failed to fetch.' + response.statusText);
@@ -33,6 +38,10 @@ async function getUsers(): Promise<User[]> {
 async function addUser(item: AddUser) {
     const response = await fetch('/api/adduser', {
         method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer '+sessionStorage.getItem("token")
+        },
         body: JSON.stringify({
           name: item.name,
           lastname: item.lastname,
@@ -51,6 +60,10 @@ async function addUser(item: AddUser) {
 async function deleteUser(item: number): Promise<User[]> {
     const response = await fetch('/api/deleteuser', {
         method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer '+sessionStorage.getItem("token")
+        },
         body: JSON.stringify({id: item}),
     });
     if (!response.ok){
@@ -62,6 +75,10 @@ async function deleteUser(item: number): Promise<User[]> {
 async function submit(item: User) {
     const response = await fetch('/api/edituser', {
         method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer '+sessionStorage.getItem("token")
+        },
         body: JSON.stringify({
             id: item.id,
             name: item.name,
@@ -76,13 +93,22 @@ async function submit(item: User) {
     return await response.json();
 }
 
-export default function Users(){
+export default function Users(props: any){
     const [search, setSearch] = useState<string>('')
     const [overlay, setOverlay] = useState<string>("none")
     const [id, setId] = useState<number>(0)
     const [osoba, setOsoba] = useState<AddUser>({name: "", lastname: "", address: "", phone: "", superuser: false, password: null, username: null});
     const [updateUsers, setUpdateUsers] = useState<boolean>(false);
     
+
+    if(props.error){
+        useEffect(() => {
+            window.location.href = "/login";
+        }, []);
+        return <div>Unauthorised</div>;
+    }
+
+
     function setOverlayData(overlayData: string, id: number){
         setId(id);
         setOverlay(overlayData);
@@ -98,6 +124,20 @@ export default function Users(){
         address: "", 
         phone: ""
     })
+    const [token, setToken] = useState("");
+
+    
+    useEffect(() => {
+        auth(sessionStorage.getItem("token") || "").then(props => {
+            console.log(props);
+            if(props.error || props.data === null){
+                window.location.href = "/login";
+            }else{
+                setToken(props.data.token);
+            }
+        }
+        )
+    }, []);
     useEffect(() => {
         getUsers().then(data => setUsers(data))
     }, [updateUsers])
@@ -115,20 +155,20 @@ export default function Users(){
     }, [id])
 
 
-
+    if(token === "") return <div></div>;
     return (
         <div className="flex w-full min-h-screen flex-col">
             <div className="flex w-full items-center p-5">
 
                 <div className="flex-1"></div>
-                <MainMenu currentPage="users" />
+                <MainMenu currentPage="users"   />
             </div>
             <div className="w-full pt-15 p-5 flex flex-col justify-center items-center">
             <h1 className="text-3xl font-semibold">Korisnici</h1>
         </div>
         <div className="max-w-xl mx-auto w-full">
             <div className="px-5 pb-3 max-w-md mx-auto">
-                <div className="flex">
+                <div className="flex flex-col md:flex-row">
                     <div className="flex-1">
                         <p className="bg-white relative text-xs ml-5 -mb-2 text-gray-500 z-10 max-w-min whitespace-nowrap px-2">ime i prezime</p>
                         <div className="border rounded flex items-center">
@@ -136,7 +176,7 @@ export default function Users(){
                             <SearchIcon className="h-5 w-5 mx-3 text-blue-500" />
                         </div>
                     </div>
-                    <div className="pt-2 pl-2 flex-1">
+                    <div className="pt-2 md:pl-2 flex-1">
                         <div className="flex justify-between border rounded items-center w-full h-full p-2" onClick={() => setOverlay("dodaj")}>
                             <PlusIcon className="h-5 w-5 text-blue-500" />
                             <p>Dodaj Korisnika</p>
@@ -319,4 +359,18 @@ export default function Users(){
 
         </div>
     )
+}
+
+async function auth(token: string): Promise<any> {
+    const response = await fetch('/api/verify', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer '+sessionStorage.getItem("token")
+        },
+        body: JSON.stringify({
+            token
+        })
+    });
+    return await response.json();
 }

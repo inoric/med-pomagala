@@ -5,6 +5,8 @@ import { SearchSelector } from '../components/SearchSelector';
 import MainMenu from '../components/MainMenu';
 import Image from 'next/image'
 import { useRouter } from 'next/dist/client/router';
+import { GetServerSideProps } from 'next';
+import jwt from 'jsonwebtoken';
 
 interface Order {
   itemId: number, 
@@ -33,7 +35,11 @@ interface Inventory {
 }
 async function getUsers(): Promise<{id: number, name: string, lastname: string, address: string, phone: string}[]> {
   const response = await fetch('/api/getusers', {
-      method: 'GET'
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer '+sessionStorage.getItem("token")
+    },
   });
   if (!response.ok){
     throw new Error('Failed to fetch.' + response.statusText);
@@ -44,6 +50,10 @@ async function getUsers(): Promise<{id: number, name: string, lastname: string, 
 async function submit(item: Order) {
   const response = await fetch('/api/addorder', {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer '+sessionStorage.getItem("token")
+    },
       body: JSON.stringify({
         itemId: item.itemId,
         inventoryCode: item.inventoryCode,
@@ -62,6 +72,10 @@ async function submit(item: Order) {
 async function getInventory(): Promise<{fullInventory: Inventory[]}> {
   const response = await fetch('/api/getinventory', {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer '+sessionStorage.getItem("token")
+    },
   });
   if (!response.ok){
     throw new Error('Failed to fetch.' + response.statusText);
@@ -72,6 +86,10 @@ async function getInventory(): Promise<{fullInventory: Inventory[]}> {
 async function addUser(item: User) {
   const response = await fetch('/api/adduser', {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer '+sessionStorage.getItem("token")
+    },
       body: JSON.stringify({
         name: item.name,
         lastname: item.lastname,
@@ -87,7 +105,7 @@ async function addUser(item: User) {
 
 
 
-function Zaduzenje() {
+function Zaduzenje(props: any) {
   const router = useRouter();
   const [overlay, setOverlay] = useState("none");
   let date = new Date(Date.now()).toLocaleString().split(',')[0]
@@ -104,6 +122,23 @@ function Zaduzenje() {
   const [dropdownCodeOptions, setDropdownCodeOptions] = useState<{id: number, name: string, available: boolean}[]>([]);
   const [zaduzenje, setZaduzenje] = useState<Order>({itemId: -1, itemName: "", inventoryCode: "", userId: -1, takenById: -1, givenById: 1, takenAt: date});
   const [inventory, setInventory] = useState<Inventory[]>([]);
+  const [token, setToken] = useState("");
+
+    
+  useEffect(() => {
+      auth(sessionStorage.getItem("token") || "").then(props => {
+          console.log(props);
+          if(props.error || props.data === null){
+              window.location.href = "/login";
+          }else{
+              setToken(props.data.token);
+              setZaduzenje({ ...zaduzenje, ["givenById"]: parseInt(props.data.userId) });
+          }
+      }
+      )
+  }, []);
+
+
   useEffect(() => {
       getInventory().then(data => {
         setInventory(data.fullInventory);
@@ -120,12 +155,6 @@ function Zaduzenje() {
       });
       
   }, []);
-  useEffect(() =>{
-    if(window.sessionStorage.getItem("id")===null){
-        window.location.href = '/login';
-    }
-    setZaduzenje({ ...zaduzenje, ["givenById"]: parseInt(window.sessionStorage.getItem("id") || "1") });
-  }, [])
   useEffect(() => {
     for(let i = 0; i < inventory.length; i++){
       if(inventory[i].id === zaduzenje.itemId){
@@ -151,6 +180,7 @@ function Zaduzenje() {
     });
   }, [updateUsers]);
   console.log(zaduzenje);
+  if(token === "") return <div></div>;
   return (
   <div className="w-full flex  min-h-screen justify-center">
 
@@ -165,7 +195,7 @@ function Zaduzenje() {
     <div className="flex flex-col p-5 flex-1">
     <div className="flex w-full items-center">
       <div className="flex-1"></div>
-      <MainMenu currentPage="zaduzenje" />
+      <MainMenu currentPage="zaduzenje"   />
     </div>
     
     <div className="w-full pt-15 p-5 flex flex-col justify-center items-center">
@@ -299,6 +329,18 @@ function Zaduzenje() {
   </div>
   );
 }
-
+async function auth(token: string): Promise<any> {
+    const response = await fetch('/api/verify', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer '+sessionStorage.getItem("token")
+      },
+        body: JSON.stringify({
+            token
+        })
+    });
+    return await response.json();
+}
 
 export default Zaduzenje;

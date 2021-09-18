@@ -1,9 +1,13 @@
 import { NextApiRequest, NextApiResponse } from "next"
 import prisma from "../../components/client";
-
+import jwt from "jsonwebtoken";
+import { checkAuth } from "../../auth";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-  const data = JSON.parse(req.body)
+  if (!checkAuth(req, res)) {
+    return;
+  }
+  const data = req.body
 
   const user = await prisma.inventory.update({
       where: { code: data.id },

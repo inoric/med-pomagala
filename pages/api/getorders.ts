@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next"
 import prisma from "../../components/client";
-
+import jwt from "jsonwebtoken";
+import { checkAuth } from "../../auth";
 interface OrderDetails {
     id: number, 
     name: string,
@@ -15,6 +16,9 @@ interface OrderDetails {
 }
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
+    if (!checkAuth(req, res)) {
+        return;
+      }
     let finalData: OrderDetails[] = []
     const raw = await prisma.orders.findMany({
         include: {

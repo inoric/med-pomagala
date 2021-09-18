@@ -1,9 +1,10 @@
 import { MinusIcon, PlusIcon } from "@heroicons/react/solid";
+import { GetServerSideProps } from "next";
 import { useEffect, useState } from "react";
 import { Dropdown } from "../components/Dropdown";
 import InventoryDropdown from "../components/InventoryDropdown";
 import MainMenu from "../components/MainMenu";
-
+import jwt from 'jsonwebtoken'
 
 interface Inventory {
     id: number;
@@ -17,7 +18,11 @@ interface Inventory {
 
 async function getInventory(): Promise<{fullInventory : Inventory[]}> {
     const response = await fetch('/api/getinventory', {
-        method: 'GET'
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer '+sessionStorage.getItem("token")
+        },
     });
     if (!response.ok){
       throw new Error('Failed to fetch.' + response.statusText);
@@ -28,6 +33,10 @@ async function getInventory(): Promise<{fullInventory : Inventory[]}> {
 async function submit(item: {itemId: number, itemName: string, inventoryCode: string}): Promise<{id:number,itemId:number,code:string,deleted: boolean} | null>  {
     const response = await fetch('/api/additem', {
         method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer '+sessionStorage.getItem("token")
+        },
         body: JSON.stringify(item),
     });
     if (!response.ok){
@@ -38,6 +47,10 @@ async function submit(item: {itemId: number, itemName: string, inventoryCode: st
 async function remove(id: string) {
     const response = await fetch('/api/removeinventory', {
         method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer '+sessionStorage.getItem("token")
+        },
         body: JSON.stringify({id: id}),
     });
     if (!response.ok){
@@ -59,13 +72,19 @@ export default function Inventar(){
     const [inventoryItems, setInventoryItems] = useState<Inventory[]>([]);
     const [dropdownOptions, setDropdownOptions] = useState<{id: number, name: string, available: boolean}[]>([]);
     const [uredaj, setUredaj] = useState<{itemId: number, itemName: string, inventoryCode: string}>({itemId: 0, itemName: "", inventoryCode: ""})
+    const [token, setToken] = useState("");
 
-    useEffect(() =>{
-        if(window.sessionStorage.getItem("id")===null){
-            window.location.href = '/login';
+    useEffect(() => {
+        auth(sessionStorage.getItem("token") || "").then(props => {
+            console.log(props);
+            if(props.error || props.data === null){
+                window.location.href = "/login";
+            }else{
+                setToken(props.data.token);
+            }
         }
-    }, [])
-
+        )
+    }, []);
     useEffect(() => {
         getInventory().then(data => {
             
@@ -111,6 +130,7 @@ export default function Inventar(){
 
         return total;
     }
+    if(token === "") return <div></div>;
     return(
         <div className="flex w-full h-screen">
             
@@ -130,7 +150,7 @@ export default function Inventar(){
             <div className="flex w-full items-center pb-5 ">
 
                 <div className="flex-1"></div>
-                <MainMenu currentPage="inventory" />
+                <MainMenu currentPage="inventory"   />
             </div>
                 <div className="flex justify-start items-end">
                     <div className="flex flex-col">
@@ -260,3 +280,17 @@ export default function Inventar(){
     )
 }
 
+async function auth(token: string): Promise<any> {
+    console.log("auth", sessionStorage.getItem("token"));
+    const response = await fetch('/api/verify', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer '+sessionStorage.getItem("token")
+        },
+        body: JSON.stringify({
+            token
+        })
+    });
+    return await response.json();
+}

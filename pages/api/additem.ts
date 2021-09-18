@@ -1,15 +1,19 @@
 import { NextApiRequest, NextApiResponse } from "next"
 import prisma from "../../components/client"
-
+import jwt from "jsonwebtoken"
+import { checkAuth } from "../../auth";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-    const data = JSON.parse(req.body)
+  if (!checkAuth(req, res)) {
+    return;
+  }
+    const data = req.body
     //count rows where name = data.name
     const itemid = await prisma.items.findFirst({
-      where: {
-        name: data.itemName,
-      },
-  })
+        where: {
+          name: data.itemName,
+        },
+    })
     if(itemid === null){
       const updatedData = await prisma.items.create({
           data: {

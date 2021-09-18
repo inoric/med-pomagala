@@ -1,8 +1,9 @@
 import { Menu, Transition } from '@headlessui/react'
-import { Fragment } from 'react'
+import { Fragment, useEffect } from 'react'
 import { ArchiveIcon, ClipboardCheckIcon, ClipboardListIcon, CollectionIcon,  LogoutIcon,  MenuIcon, UsersIcon } from '@heroicons/react/outline'
 import Link from 'next/link'
-
+import { GetServerSideProps } from 'next'
+import jwt from 'jsonwebtoken'
 
 interface Props {
     currentPage: string
@@ -10,6 +11,7 @@ interface Props {
 
 
 export default function MainMenu({currentPage}: Props) {
+
 
   return (
     <div className="w-10 text-right">

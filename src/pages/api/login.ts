@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next"
-import prisma from "../../components/client";
+import prisma from "@components/client";
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 

@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next"
-import prisma from "../../components/client";
+import prisma from "@components/client";
 import jwt from "jsonwebtoken";
-import { checkAuth } from "../../auth";
+import { checkAuth } from "@/auth";
 interface OrderDetails {
     id: number, 
     name: string,
@@ -12,12 +12,10 @@ interface OrderDetails {
     inventoryCode: string , 
     takenBy: string, 
     takenByAddress: string, 
-    takenByPhone: string,
-    returnedAt: string,
+    takenByPhone: string 
 }
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-
     if (!checkAuth(req, res)) {
         return;
       }
@@ -36,19 +34,20 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         }
     });
     raw.filter(item => {
-        finalData.push({
-            id: item.id, 
-            name: item.user.name,
-            phone: item.user.phone,
-            address: item.user.address,
-            itemName: item.inventory.item.name,
-            date: item.takenAt, 
-            inventoryCode: item.inventory.code,
-            takenBy: item.takenBy.name,
-            takenByAddress: item.takenBy.address,
-            takenByPhone: item.takenBy.phone,
-            returnedAt: item.Returns ? item.Returns.returnedAt : "--/--/---",
-        })
+        if (item.Returns === null) {
+            finalData.push({
+                id: item.id, 
+                name: item.user.name + " " + item.user.lastname,
+                phone: item.user.phone,
+                address: item.user.address,
+                itemName: item.inventory.item.name,
+                date: item.takenAt, 
+                inventoryCode: item.inventory.code,
+                takenBy: item.takenBy.name,
+                takenByAddress: item.takenBy.address,
+                takenByPhone: item.takenBy.phone,
+            })
+        }
     })
     res.status(200).json(finalData)    
 }

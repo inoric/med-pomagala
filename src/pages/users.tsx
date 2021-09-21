@@ -1,8 +1,8 @@
 import { PencilIcon, PlusIcon, SearchIcon, TrashIcon,  } from "@heroicons/react/outline";
 import { GetServerSideProps } from "next";
 import React, { useEffect, useState } from "react";
-import MainMenu from "../components/MainMenu";
-import ThreeDotUsersDropdown from "../components/ThreeDotUsersDropdown";
+import MainMenu from "@components/MainMenu";
+import ThreeDotUsersDropdown from "@components/ThreeDotUsersDropdown";
 import jwt from 'jsonwebtoken'
 
 interface User {

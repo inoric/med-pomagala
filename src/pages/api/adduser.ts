@@ -1,8 +1,8 @@
 import { NextApiRequest, NextApiResponse } from "next"
-import prisma from "../../components/client"
+import prisma from "@components/client"
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { checkAuth } from "../../auth";
+import { checkAuth } from "@/auth";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (!checkAuth(req, res)) {

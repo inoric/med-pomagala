@@ -1,9 +1,9 @@
-import scene from '../public/scene.png';
-import scene0 from '../public/scene0.png';
-import scene1 from '../public/scene1.png';
-import scene2 from '../public/scene2.png';
-import scene3 from '../public/scene3.png';
-import mobile0 from '../public/mobile0.png';
+import scene from '@public/scene.png';
+import scene0 from '@public/scene0.png';
+import scene1 from '@public/scene1.png';
+import scene2 from '@public/scene2.png';
+import scene3 from '@public/scene3.png';
+import mobile0 from '@public/mobile0.png';
 import Image from 'next/image'
 import { ClipboardListIcon, CollectionIcon, InformationCircleIcon, SaveIcon } from '@heroicons/react/outline';
 import { useEffect, useState } from 'react';

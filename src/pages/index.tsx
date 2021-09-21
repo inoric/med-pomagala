@@ -1,9 +1,9 @@
 import { MinusIcon, PlusIcon } from "@heroicons/react/solid";
 import { GetServerSideProps } from "next";
 import { useEffect, useState } from "react";
-import { Dropdown } from "../components/Dropdown";
-import InventoryDropdown from "../components/InventoryDropdown";
-import MainMenu from "../components/MainMenu";
+import { Dropdown } from "@components/Dropdown";
+import InventoryDropdown from "@components/InventoryDropdown";
+import MainMenu from "@components/MainMenu";
 import jwt from 'jsonwebtoken'
 
 interface Inventory {

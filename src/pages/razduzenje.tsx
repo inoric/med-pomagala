@@ -1,7 +1,7 @@
 import { CheckIcon,  SearchIcon } from "@heroicons/react/outline";
 import React, { useEffect } from "react";
-import ThreeDotDropdown from "../components/ThreeDotDropdown";
-import MainMenu from "../components/MainMenu";
+import ThreeDotDropdown from "@components/ThreeDotDropdown";
+import MainMenu from "@components/MainMenu";
 import { GetServerSideProps } from "next";
 import jwt from 'jsonwebtoken'
 

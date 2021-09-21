@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import {  PlusIcon } from '@heroicons/react/outline'
-import { Dropdown } from '../components/Dropdown';
-import { SearchSelector } from '../components/SearchSelector';
-import MainMenu from '../components/MainMenu';
+import { Dropdown } from '@components/Dropdown';
+import { SearchSelector } from '@components/SearchSelector';
+import MainMenu from '@components/MainMenu';
 import Image from 'next/image'
 import { useRouter } from 'next/dist/client/router';
 import { GetServerSideProps } from 'next';

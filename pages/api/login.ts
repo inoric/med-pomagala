@@ -4,6 +4,10 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
+    if (!process.env.SECRET_TOKEN) {
+        throw new Error('Missing SECRET_TOKEN for signing session keys');
+    }
+
     // get todays date in ddmmyy format
     const today = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
     const response = req.body
@@ -23,7 +27,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         return;
     }
     const isValid = await bcrypt.compare(response.password, data.password || "");
-    if(isValid && process.env.SECRET_TOKEN !== undefined) {
+    if(isValid) {
         res.status(200).json({
             error: false,
             id: data.id,

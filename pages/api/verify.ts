@@ -2,10 +2,12 @@ import { NextApiRequest, NextApiResponse } from "next"
 import jwt from "jsonwebtoken"
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-    console.log(req.body)
+    if (!process.env.SECRET_TOKEN) {
+        throw new Error('Missing SECRET_TOKEN for signing session keys');
+    }
     const token = req.body.token
     if(jwt.decode(token)!==null)
-    if(jwt.verify(token, process.env.SECRET_TOKEN || "secret")){
+    if(jwt.verify(token, process.env.SECRET_TOKEN)){
         const data = jwt.decode(token)
         if(typeof data === "object" && data)
         if(data.date === new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }))

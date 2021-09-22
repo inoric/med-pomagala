@@ -9,6 +9,7 @@ import { GetServerSideProps } from 'next';
 import jwt from 'jsonwebtoken';
 import { useAuthGuard } from '@/use-auth-guard';
 import { apiGet, apiPost } from '@/api';
+import { getTokenData } from '@/client-token';
 
 interface Order {
   itemId: number, 
@@ -82,7 +83,15 @@ function Zaduzenje(props: any) {
 
   const [dropdownOptions, setDropdownOptions] = useState<{id: number, name: string, available: boolean}[]>([]);
   const [dropdownCodeOptions, setDropdownCodeOptions] = useState<{id: number, name: string, available: boolean}[]>([]);
-  const [zaduzenje, setZaduzenje] = useState<Order>({itemId: -1, itemName: "", inventoryCode: "", userId: -1, takenById: -1, givenById: 1, takenAt: date});
+  const [zaduzenje, setZaduzenje] = useState<Order>({
+    itemId: -1,
+    itemName: "",
+    inventoryCode: "",
+    userId: -1,
+    takenById: -1,
+    givenById: getTokenData()?.userId ?? -1,
+    takenAt: date
+  });
   const [inventory, setInventory] = useState<Inventory[]>([]);
 
   useEffect(() => {

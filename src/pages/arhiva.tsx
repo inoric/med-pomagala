@@ -4,6 +4,7 @@ import { DataGrid, GridColDef, GridToolbarContainer, GridToolbarExport, GridValu
 import { GetServerSideProps } from "next";
 import jwt from 'jsonwebtoken'
 import { useAuthGuard } from "@/use-auth-guard";
+import { apiGet } from "@/api";
 
 
 interface OrderDetails {
@@ -22,19 +23,8 @@ interface OrderDetails {
 
 
 async function getOrders(): Promise<OrderDetails[]> {
-    
-    const response = await fetch('/api/getarchive', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + sessionStorage.getItem("token")
-        },
-    });
-    if (!response.ok){
-      throw new Error('Failed to fetch.' + response.statusText);
-    }
-    return await response.json();
-  }
+    return apiGet('/api/getarchive');
+}
 
 export default function Arhiva(){
     const token = useAuthGuard();

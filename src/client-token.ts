@@ -16,6 +16,10 @@ export function unsetToken(): void {
 }
 
 export function getToken(): string|null {
+    if (!process.browser) {
+        return null;
+    }
+
     const token = window.sessionStorage.getItem(TOKEN_KEY);
     if (!token) { // Token not set
         return null;
@@ -28,7 +32,7 @@ export function getToken(): string|null {
  * Get decoded token. Null will be returned for expired tokens.
  */
 export function getTokenData(): TokenData|null {
-    const token = window.sessionStorage.getItem(TOKEN_KEY);
+    const token = getToken();
     if (!token) { // Token not set
         return null;
     }

@@ -7,6 +7,7 @@ import MainMenu from "@components/MainMenu";
 import jwt from 'jsonwebtoken'
 import { getTokenData } from "@/client-token";
 import { useAuthGuard } from "@/use-auth-guard";
+import { apiGet, apiPost } from "@/api";
 
 interface Inventory {
     id: number;
@@ -19,49 +20,16 @@ interface Inventory {
 }
 
 async function getInventory(): Promise<{fullInventory : Inventory[]}> {
-    const response = await fetch('/api/getinventory', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer '+sessionStorage.getItem("token")
-        },
-    });
-    if (!response.ok){
-      throw new Error('Failed to fetch.' + response.statusText);
-    }
-    return await response.json();
+    return apiGet('/api/getinventory');
 }
 
 async function submit(item: {itemId: number, itemName: string, inventoryCode: string}): Promise<{id:number,itemId:number,code:string,deleted: boolean} | null>  {
-    const response = await fetch('/api/additem', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer '+sessionStorage.getItem("token")
-        },
-        body: JSON.stringify(item),
-    });
-    if (!response.ok){
-      return null;
-    }
-    return await response.json();
+    return apiPost('/api/additem', item);
 }
+
 async function remove(id: string) {
-    const response = await fetch('/api/removeinventory', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer '+sessionStorage.getItem("token")
-        },
-        body: JSON.stringify({id: id}),
-    });
-    if (!response.ok){
-      return new Error('Failed to fetch.' + response.statusText);
-    }
-    return await response.json();
+    return apiPost('/api/removeinventory', { id });
 }
-
-
 
 export default function Inventar(){
     const token = useAuthGuard();

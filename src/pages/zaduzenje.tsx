@@ -8,6 +8,7 @@ import { useRouter } from 'next/dist/client/router';
 import { GetServerSideProps } from 'next';
 import jwt from 'jsonwebtoken';
 import { useAuthGuard } from '@/use-auth-guard';
+import { apiGet, apiPost } from '@/api';
 
 interface Order {
   itemId: number, 
@@ -35,76 +36,35 @@ interface Inventory {
       }[]
 }
 async function getUsers(): Promise<{id: number, name: string, lastname: string, address: string, phone: string}[]> {
-  const response = await fetch('/api/getusers', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer '+sessionStorage.getItem("token")
-    },
-  });
-  if (!response.ok){
-    throw new Error('Failed to fetch.' + response.statusText);
-  }
-  return await response.json();
+  return apiGet('/api/getusers');
 }
 
-async function submit(item: Order) {
-  const response = await fetch('/api/addorder', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer '+sessionStorage.getItem("token")
-    },
-      body: JSON.stringify({
-        itemId: item.itemId,
-        inventoryCode: item.inventoryCode,
-        userId: item.userId,
-        takenById: item.takenById,
-        givenById: item.givenById,
-        takenAt: item.takenAt,
-      })
+async function submit({
+  itemId,
+  inventoryCode,
+  userId,
+  takenById,
+  givenById,
+  takenAt,
+}: Order) {
+  // itemName ommited
+  return apiPost('/api/addorder', {
+    itemId,
+    inventoryCode,
+    userId,
+    takenById,
+    givenById,
+    takenAt,
   });
-  if (!response.ok){
-    throw new Error('Failed to fetch.' + response.statusText);
-  }
-  return await response.json();
 }
 
 async function getInventory(): Promise<{fullInventory: Inventory[]}> {
-  const response = await fetch('/api/getinventory', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer '+sessionStorage.getItem("token")
-    },
-  });
-  if (!response.ok){
-    throw new Error('Failed to fetch.' + response.statusText);
-  }
-  return await response.json();
+  return apiGet('/api/getinventory');
 }
 
-async function addUser(item: User) {
-  const response = await fetch('/api/adduser', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer '+sessionStorage.getItem("token")
-    },
-      body: JSON.stringify({
-        name: item.name,
-        lastname: item.lastname,
-        phone: item.phone,
-        address: item.address,
-      })
-  });
-  if (!response.ok){
-    throw new Error('Failed to fetch.' + response.statusText);
-  }
-  return await response.json();
+async function addUser(user: User) {
+  return apiPost('/api/adduser', user);
 }
-
-
 
 function Zaduzenje(props: any) {
   const token = useAuthGuard();

@@ -7,25 +7,15 @@ import mobile0 from '@public/mobile0.png';
 import Image from 'next/image'
 import { ClipboardListIcon, CollectionIcon, InformationCircleIcon, SaveIcon } from '@heroicons/react/outline';
 import { useEffect, useState } from 'react';
+import { apiPost } from '@/api';
 
-async function login(item: { username: string, password: string }): Promise<{token: string, error: boolean}> {
-    const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer '+sessionStorage.getItem("token")
-        },
-        body: JSON.stringify({
-          username: item.username,
-          password: item.password
-        })
-    });
-    if(!response.ok) {
-        return {token: "FU", error: true};
-    }
-    return await response.json();
-  }
-
+interface LoginData {
+    username: string;
+    password: string;
+}
+async function login({ username, password }: LoginData): Promise<{token: string, error: boolean}> {
+    return apiPost('/api/login', { username, password });
+}
 
 export default function Login(props: {user: number}) {
     const [logoColor, setLogoColor] = useState('#66F');

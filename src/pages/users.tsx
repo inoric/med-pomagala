@@ -5,6 +5,7 @@ import MainMenu from "@components/MainMenu";
 import ThreeDotUsersDropdown from "@components/ThreeDotUsersDropdown";
 import jwt from 'jsonwebtoken'
 import { useAuthGuard } from "@/use-auth-guard";
+import { apiGet, apiPost } from "@/api";
 
 interface User {
     id: number, 
@@ -24,74 +25,19 @@ interface AddUser {
 }
 
 async function getUsers(): Promise<User[]> {
-    const response = await fetch('/api/getusers', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer '+sessionStorage.getItem("token")
-        },
-    });
-    if (!response.ok){
-      throw new Error('Failed to fetch.' + response.statusText);
-    }
-    return await response.json();
+    return apiGet('/api/getusers');
 }
-async function addUser(item: AddUser) {
-    const response = await fetch('/api/adduser', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer '+sessionStorage.getItem("token")
-        },
-        body: JSON.stringify({
-          name: item.name,
-          lastname: item.lastname,
-          phone: item.phone,
-          address: item.address,
-          superuser: item.superuser,
-          password: item.password,
-          username: item.username
-        })
-    });
-    if (!response.ok){
-      throw new Error('Failed to fetch.' + response.statusText);
-    }
-    return await response.json();
-  }
-async function deleteUser(item: number): Promise<User[]> {
-    const response = await fetch('/api/deleteuser', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer '+sessionStorage.getItem("token")
-        },
-        body: JSON.stringify({id: item}),
-    });
-    if (!response.ok){
-      throw new Error('Failed to fetch.' + response.statusText);
-    }
-    return await response.json();
-  }
 
-async function submit(item: User) {
-    const response = await fetch('/api/edituser', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer '+sessionStorage.getItem("token")
-        },
-        body: JSON.stringify({
-            id: item.id,
-            name: item.name,
-            lastname: item.lastname,
-            address: item.address,
-            phone: item.phone
-        })
-    });
-    if (!response.ok){
-        throw new Error('Failed to fetch.' + response.statusText);
-    }
-    return await response.json();
+async function addUser(item: AddUser) {
+    return apiPost('/api/adduser', item);
+}
+
+async function deleteUser(id: number): Promise<User[]> {
+    return apiPost('/api/deleteuser', { id });
+}
+
+async function submit(user: User) {
+    return apiPost('/api/edituser', user);
 }
 
 export default function Users(props: any){

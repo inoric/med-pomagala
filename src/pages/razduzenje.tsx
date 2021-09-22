@@ -6,6 +6,7 @@ import { GetServerSideProps } from "next";
 import jwt from 'jsonwebtoken'
 import { useAuthGuard } from "@/use-auth-guard";
 import { getTokenData } from "@/client-token";
+import { apiGet, apiPost } from "@/api";
 
 
 interface OrderDetails {
@@ -21,38 +22,19 @@ interface OrderDetails {
     takenByPhone: string 
 }
 
-async function submit(item: {orderId: number, takenByid: number, returnedAt: string}) {
-    const response = await fetch('/api/returnorder', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer '+sessionStorage.getItem("token")
-        },
-        body: JSON.stringify({
-            orderId: item.orderId,
-            takenByid: item.takenByid,
-            returnedAt: item.returnedAt
-        })
-    });
-    if (!response.ok){
-        throw new Error('Failed to fetch.' + response.statusText);
-    }
-    return await response.json();
+async function submit({
+    orderId, takenByid, returnedAt,
+}: {
+    orderId: number;
+    takenByid: number;
+    returnedAt: string;
+}) {
+    return apiPost('/api/returnorder', { orderId, takenByid, returnedAt });
 }
 
 async function getOrders(): Promise<OrderDetails[]> {
-    const response = await fetch('/api/getorders', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer '+sessionStorage.getItem("token")
-        },
-    });
-    if (!response.ok){
-      throw new Error('Failed to fetch.' + response.statusText);
-    }
-    return await response.json();
-  }
+    return apiGet('/api/getorders');
+}
 
 
 function Razduzenje(){

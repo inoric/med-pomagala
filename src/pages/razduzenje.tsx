@@ -94,6 +94,19 @@ function Razduzenje(){
         return null;
     }
 
+    const confirm = async () => {
+        const orderId = activeOrder.id;
+        await submit({
+            orderId,
+            takenByid: tokenData.userId,
+            returnedAt: date,
+        });
+        setOrders(
+            orders.filter((order) => order.id !== orderId)
+        );
+        setOverlay("none");
+    };
+
     return (
     <div className="w-full flex flex-col min-h-screen">
         <div className="flex w-full items-center p-5">
@@ -201,7 +214,7 @@ function Razduzenje(){
                 placeholder="dd/mm/yyyy"
                 onChange={(e) => setDate(e.target.value)}></input>
                 </div>
-                <div className="shadow rounded p-3 flex items-center mt-3" onClick={() => {submit( { orderId: activeOrder.id, takenByid: tokenData.userId, returnedAt: date } );setOverlay("none");window.location.reload()}}>
+                <div className="shadow rounded p-3 flex items-center mt-3" onClick={confirm}>
                     <CheckIcon className="h-5 w-5 text-green-500 mr-2" />
                     <p>Potvrdi</p>
                 </div>

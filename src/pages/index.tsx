@@ -5,6 +5,8 @@ import { Dropdown } from "@components/Dropdown";
 import InventoryDropdown from "@components/InventoryDropdown";
 import MainMenu from "@components/MainMenu";
 import jwt from 'jsonwebtoken'
+import { getTokenData } from "@/client-token";
+import { useAuthGuard } from "@/use-auth-guard";
 
 interface Inventory {
     id: number;
@@ -62,6 +64,8 @@ async function remove(id: string) {
 
 
 export default function Inventar(){
+    const token = useAuthGuard();
+
     const [open, setOpen] = useState<boolean>(false);
     const [todelete, setTodelete] = useState<string>("none");
     const [newitem, setNewitem] = useState<boolean>(false);
@@ -72,19 +76,7 @@ export default function Inventar(){
     const [inventoryItems, setInventoryItems] = useState<Inventory[]>([]);
     const [dropdownOptions, setDropdownOptions] = useState<{id: number, name: string, available: boolean}[]>([]);
     const [uredaj, setUredaj] = useState<{itemId: number, itemName: string, inventoryCode: string}>({itemId: 0, itemName: "", inventoryCode: ""})
-    const [token, setToken] = useState("");
 
-    useEffect(() => {
-        auth(sessionStorage.getItem("token") || "").then(props => {
-            console.log(props);
-            if(props.error || props.data === null){
-                window.location.href = "/login";
-            }else{
-                setToken(props.data.token);
-            }
-        }
-        )
-    }, []);
     useEffect(() => {
         getInventory().then(data => {
             
@@ -130,7 +122,7 @@ export default function Inventar(){
 
         return total;
     }
-    if(token === "") return <div></div>;
+    if(!token) return null;
     return(
         <div className="flex w-full h-screen">
             
@@ -278,19 +270,4 @@ export default function Inventar(){
 
         </div>
     )
-}
-
-async function auth(token: string): Promise<any> {
-    console.log("auth", sessionStorage.getItem("token"));
-    const response = await fetch('/api/verify', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer '+sessionStorage.getItem("token")
-        },
-        body: JSON.stringify({
-            token
-        })
-    });
-    return await response.json();
 }

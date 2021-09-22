@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import MainMenu from "@components/MainMenu";
 import ThreeDotUsersDropdown from "@components/ThreeDotUsersDropdown";
 import jwt from 'jsonwebtoken'
+import { useAuthGuard } from "@/use-auth-guard";
 
 interface User {
     id: number, 
@@ -94,6 +95,7 @@ async function submit(item: User) {
 }
 
 export default function Users(props: any){
+    const token = useAuthGuard();
     const [search, setSearch] = useState<string>('')
     const [overlay, setOverlay] = useState<string>("none")
     const [id, setId] = useState<number>(0)
@@ -124,20 +126,7 @@ export default function Users(props: any){
         address: "", 
         phone: ""
     })
-    const [token, setToken] = useState("");
 
-    
-    useEffect(() => {
-        auth(sessionStorage.getItem("token") || "").then(props => {
-            console.log(props);
-            if(props.error || props.data === null){
-                window.location.href = "/login";
-            }else{
-                setToken(props.data.token);
-            }
-        }
-        )
-    }, []);
     useEffect(() => {
         getUsers().then(data => setUsers(data))
     }, [updateUsers])
@@ -155,7 +144,7 @@ export default function Users(props: any){
     }, [id])
 
 
-    if(token === "") return <div></div>;
+    if(!token) return null;
     return (
         <div className="flex w-full min-h-screen flex-col">
             <div className="flex w-full items-center p-5">
@@ -359,18 +348,4 @@ export default function Users(props: any){
 
         </div>
     )
-}
-
-async function auth(token: string): Promise<any> {
-    const response = await fetch('/api/verify', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer '+sessionStorage.getItem("token")
-        },
-        body: JSON.stringify({
-            token
-        })
-    });
-    return await response.json();
 }

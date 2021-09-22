@@ -3,6 +3,7 @@ import MainMenu from "@components/MainMenu";
 import { DataGrid, GridColDef, GridToolbarContainer, GridToolbarExport, GridValueGetterParams } from '@material-ui/data-grid';
 import { GetServerSideProps } from "next";
 import jwt from 'jsonwebtoken'
+import { useAuthGuard } from "@/use-auth-guard";
 
 
 interface OrderDetails {
@@ -36,23 +37,8 @@ async function getOrders(): Promise<OrderDetails[]> {
   }
 
 export default function Arhiva(){
+    const token = useAuthGuard();
     const [orders, setOrders] = useState<OrderDetails[]>([]);
-    const [token, setToken] = useState("");
-
-    
-    useEffect(() => {
-        auth(sessionStorage.getItem("token") || "").then(props => {
-            console.log(props);
-            if(props.error || props.data === null){
-                window.location.href = "/login";
-            }else{
-                setToken(props.data.token);
-            }
-        }
-        )
-    }, []);
-    
-    
 
     const columns: GridColDef[] = [
         {field: 'id', headerName: 'ID', width: 100},
@@ -98,14 +84,12 @@ export default function Arhiva(){
             width: 100,
         }
     ]
-
-
     
     useEffect(() => {
         getOrders().then(setOrders);
     }, []);
 
-    if(token === "") return <div></div>;
+    if(!token) return null;
     return(
         <div className="w-full flex p-5 flex-col h-screen">
             <div className="flex w-full items-center">
@@ -139,16 +123,3 @@ function CustomToolbar() {
       </GridToolbarContainer>
     );
   }
-  async function auth(token: string): Promise<any> {
-    const response = await fetch('/api/verify', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + sessionStorage.getItem("token")
-        },
-        body: JSON.stringify({
-            token
-        })
-    });
-    return await response.json();
-}

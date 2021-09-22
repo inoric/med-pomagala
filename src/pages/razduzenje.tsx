@@ -4,6 +4,8 @@ import ThreeDotDropdown from "@components/ThreeDotDropdown";
 import MainMenu from "@components/MainMenu";
 import { GetServerSideProps } from "next";
 import jwt from 'jsonwebtoken'
+import { useAuthGuard } from "@/use-auth-guard";
+import { getTokenData } from "@/client-token";
 
 
 interface OrderDetails {
@@ -54,7 +56,8 @@ async function getOrders(): Promise<OrderDetails[]> {
 
 
 function Razduzenje(){
-    
+    const token = useAuthGuard();
+
     const [search, setSearch] = React.useState<string>('')
     const [overlay, setOverlay] = React.useState<string>("none")
     const [id, setId] = React.useState<number>(0)
@@ -73,20 +76,7 @@ function Razduzenje(){
         takenByAddress: "", 
         takenByPhone: "" 
     })
-    const [token, setToken] = React.useState(0);
 
-    
-    useEffect(() => {
-        auth(sessionStorage.getItem("token") || "").then(props => {
-            console.log(props);
-            if(props.error || props.data === null){
-                window.location.href = "/login";
-            }else{
-                setToken(props.data.userId);
-            }
-        }
-        )
-    }, []);
     useEffect(() => {
         getOrders().then(data => {
             setOrders(data)
@@ -117,9 +107,11 @@ function Razduzenje(){
         setOverlay(overlayData);
     }
 
-    
+    const tokenData = getTokenData();
+    if(!token || !tokenData) {
+        return null;
+    }
 
-    if(token === 0) return <div></div>;
     return (
     <div className="w-full flex flex-col min-h-screen">
         <div className="flex w-full items-center p-5">
@@ -227,7 +219,7 @@ function Razduzenje(){
                 placeholder="dd/mm/yyyy"
                 onChange={(e) => setDate(e.target.value)}></input>
                 </div>
-                <div className="shadow rounded p-3 flex items-center mt-3" onClick={() => {submit( { orderId: activeOrder.id, takenByid: token, returnedAt: date } );setOverlay("none");window.location.reload()}}>
+                <div className="shadow rounded p-3 flex items-center mt-3" onClick={() => {submit( { orderId: activeOrder.id, takenByid: tokenData.userId, returnedAt: date } );setOverlay("none");window.location.reload()}}>
                     <CheckIcon className="h-5 w-5 text-green-500 mr-2" />
                     <p>Potvrdi</p>
                 </div>
@@ -242,21 +234,5 @@ function Razduzenje(){
     </div>
     );
 }
-
-
-async function auth(token: string): Promise<any> {
-    const response = await fetch('/api/verify', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer '+sessionStorage.getItem("token")
-        },
-        body: JSON.stringify({
-            token
-        })
-    });
-    return await response.json();
-}
-
 
 export default Razduzenje;

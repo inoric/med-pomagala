@@ -7,6 +7,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/dist/client/router';
 import { GetServerSideProps } from 'next';
 import jwt from 'jsonwebtoken';
+import { useAuthGuard } from '@/use-auth-guard';
 
 interface Order {
   itemId: number, 
@@ -106,6 +107,7 @@ async function addUser(item: User) {
 
 
 function Zaduzenje(props: any) {
+  const token = useAuthGuard();
   const router = useRouter();
   const [overlay, setOverlay] = useState("none");
   let date = new Date(Date.now()).toLocaleString().split(',')[0]
@@ -122,22 +124,6 @@ function Zaduzenje(props: any) {
   const [dropdownCodeOptions, setDropdownCodeOptions] = useState<{id: number, name: string, available: boolean}[]>([]);
   const [zaduzenje, setZaduzenje] = useState<Order>({itemId: -1, itemName: "", inventoryCode: "", userId: -1, takenById: -1, givenById: 1, takenAt: date});
   const [inventory, setInventory] = useState<Inventory[]>([]);
-  const [token, setToken] = useState("");
-
-    
-  useEffect(() => {
-      auth(sessionStorage.getItem("token") || "").then(props => {
-          console.log(props);
-          if(props.error || props.data === null){
-              window.location.href = "/login";
-          }else{
-              setToken(props.data.token);
-              setZaduzenje({ ...zaduzenje, ["givenById"]: parseInt(props.data.userId) });
-          }
-      }
-      )
-  }, []);
-
 
   useEffect(() => {
       getInventory().then(data => {
@@ -180,7 +166,7 @@ function Zaduzenje(props: any) {
     });
   }, [updateUsers]);
   console.log(zaduzenje);
-  if(token === "") return <div></div>;
+  if(!token) return null;
   return (
   <div className="w-full flex  min-h-screen justify-center">
 
@@ -328,19 +314,6 @@ function Zaduzenje(props: any) {
 
   </div>
   );
-}
-async function auth(token: string): Promise<any> {
-    const response = await fetch('/api/verify', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer '+sessionStorage.getItem("token")
-      },
-        body: JSON.stringify({
-            token
-        })
-    });
-    return await response.json();
 }
 
 export default Zaduzenje;

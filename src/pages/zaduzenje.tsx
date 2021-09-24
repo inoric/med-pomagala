@@ -136,6 +136,17 @@ function Zaduzenje(props: any) {
   }, [updateUsers]);
   console.log(zaduzenje);
   if(!token) return null;
+
+  const submitZaduzenje = async () => {
+    if(zaduzenje.userId === -1 || zaduzenje.takenById === -1 || zaduzenje.itemId === -1 || zaduzenje.inventoryCode === "") {
+      setError("Unesi sva polja prvo!");
+      return;
+    }
+
+    await submit(zaduzenje);
+    router.push("/razduzenje");
+  };
+
   return (
   <div className="w-full flex  min-h-screen justify-center">
 
@@ -214,14 +225,7 @@ function Zaduzenje(props: any) {
     
     </div>
     <button className="rounded max-w-xl z-0 mx-auto mt-3 shadow w-full p-3 text-white bg-blue-900 font-semibold text-lg active:bg-blue-900 active:text-white"
-            onClick={() => {
-              if(zaduzenje.userId === -1 || zaduzenje.takenById === -1 || zaduzenje.itemId === -1 || zaduzenje.inventoryCode === "")
-              setError("Unesi sva polja prvo!")
-              else{
-                submit(zaduzenje)
-                router.push("/razduzenje")
-              }
-            }}>
+            onClick={submitZaduzenje}>
     unesi</button>
     </div>
 

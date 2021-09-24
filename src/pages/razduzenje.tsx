@@ -112,7 +112,7 @@ function Razduzenje(){
         <div className="flex w-full items-center p-5">
 
             <div className="flex-1"></div>
-            <MainMenu currentPage="razduzenje"   />
+            <MainMenu />
         </div>
         <div className="w-full pt-15 p-5 flex flex-col justify-center items-center">
             <h1 className="text-3xl font-semibold">Razduženje</h1>

@@ -110,7 +110,7 @@ export default function Inventar(){
             <div className="flex w-full items-center pb-5 ">
 
                 <div className="flex-1"></div>
-                <MainMenu currentPage="inventory"   />
+                <MainMenu />
             </div>
                 <div className="flex justify-start items-end">
                     <div className="flex flex-col">

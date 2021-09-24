@@ -84,7 +84,7 @@ export default function Arhiva(){
         <div className="w-full flex p-5 flex-col h-screen">
             <div className="flex w-full items-center">
             <div className="flex-1"></div>
-            <MainMenu currentPage="archive" />
+            <MainMenu />
             </div>
             <div className="w-full pt-15 p-5 flex flex-col justify-center items-center">
                 <h1 className="text-3xl font-semibold">Arhiva</h1>

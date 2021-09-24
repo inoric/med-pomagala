@@ -161,7 +161,7 @@ function Zaduzenje(props: any) {
     <div className="flex flex-col p-5 flex-1">
     <div className="flex w-full items-center">
       <div className="flex-1"></div>
-      <MainMenu currentPage="zaduzenje"   />
+      <MainMenu />
     </div>
     
     <div className="w-full pt-15 p-5 flex flex-col justify-center items-center">

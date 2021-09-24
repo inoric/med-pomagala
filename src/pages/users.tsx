@@ -96,7 +96,7 @@ export default function Users(props: any){
             <div className="flex w-full items-center p-5">
 
                 <div className="flex-1"></div>
-                <MainMenu currentPage="users"   />
+                <MainMenu />
             </div>
             <div className="w-full pt-15 p-5 flex flex-col justify-center items-center">
             <h1 className="text-3xl font-semibold">Korisnici</h1>
